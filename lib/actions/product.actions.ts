@@ -9,12 +9,16 @@ export async function getLatestProducts() {
     take: LATEST_PRODUCTS_LIMIT,
     orderBy: { createdAt: 'desc' },
   });
-  return convertToPlainObject(data);
+  const plainData = convertToPlainObject(data);
+  return plainData.map((product) => ({
+    ...product,
+    rating: Number(product.rating),
+  }));
 }
 
 // Get single product by its slug
 export async function getProductBySlug(slug: string) {
   return await prisma.product.findFirst({
-    where: {slug: slug}
-  })
+    where: { slug: slug },
+  });
 }
