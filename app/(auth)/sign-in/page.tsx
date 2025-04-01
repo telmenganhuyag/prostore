@@ -18,14 +18,14 @@ export const metadata: Metadata = {
 };
 
 const SignInPage = async (props: {
-  // searchParams: Promise<{ callbackUrl: string }>;
+  searchParams: Promise<{ callbackUrl: string }>;
 }) => {
-  // const { callbackUrl } = await props.searchParams;
-  // const session = await auth();
+  const { callbackUrl } = await props.searchParams;
+  const session = await auth();
 
-  // if (session) {
-  //   return redirect(callbackUrl || '/');
-  // }
+  if (session) {
+    return redirect(callbackUrl || '/');
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
