@@ -54,23 +54,37 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
         // User is available during sign-in
         token.id = user.id;
+        token.role = user.role;
+
+        // If user has no name then use the email
+        if (user.name === 'NO_NAME') {
+          token.name = user.email.split('@')[0];
+
+          // Update database to reflect the token name
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { name: token.name },
+          });
+        }
       }
       return token;
     },
-    session({ session, token, trigger, user }) {
+    async session({ session, token, trigger, user }: any) {
       session.user.id = token.id as string;
+      session.user.role = token.role;
+      session.user.name = token.name;
 
-      if (trigger === 'update' ) {
+      if (trigger === 'update') {
         session.user.name = user.name;
       }
-       
+
       return session;
     },
   },
 } satisfies NextAuthConfig;
 
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig) 
+export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);
