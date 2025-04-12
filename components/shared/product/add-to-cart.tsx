@@ -13,10 +13,7 @@ const AddToCart = ({ item }: { item: CartItem }) => {
     const res = await addItemToCart(item);
 
     if (!res.success) {
-      toast.error('This is an error message', {
-        className:
-          'flex items-center gap-1 bg-red-500 text-white p-4 rounded-lg shadow-md',
-      });
+      toast.error('This is an error message');
       return;
     }
 
@@ -33,21 +30,6 @@ const AddToCart = ({ item }: { item: CartItem }) => {
         </Button>
       ),
     });
-
-    // toast.custom((t) => (
-    //   <div className="flex items-center gap-4 bg-white p-4 rounded shadow-md">
-    //     <span className="text-sm">{item.name} added to cart</span>
-    //     <button
-    //       className="bg-primary text-white px-4 py-1 rounded text-sm whitespace-nowrap hover:bg-gray-800"
-    //       onClick={() => {
-    //         router.push('/cart');
-    //         toast.dismiss(t); // dismiss the toast manually after action
-    //       }}
-    //     >
-    //       Go To Cart
-    //     </button>
-    //   </div>
-    // ));
   };
 
   return (
@@ -56,6 +38,7 @@ const AddToCart = ({ item }: { item: CartItem }) => {
       type="button"
       onClick={handleAddToCart}
     >
+      <Plus />
       Add To Cart
     </Button>
   );

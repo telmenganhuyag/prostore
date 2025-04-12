@@ -3,15 +3,16 @@ import Credentials from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/db/prisma';
 import { compareSync } from 'bcrypt-ts-edge';
-import type { NextAuthConfig } from 'next-auth';
+import { authConfig } from './auth.config';
+import { cookies } from 'next/headers';
 
-export const authConfig = {
+export const config = {
   pages: {
     signIn: '/sign-in',
     error: '/sign-in',
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   adapter: PrismaAdapter(prisma),
@@ -54,6 +55,7 @@ export const authConfig = {
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }: any) {
       if (user) {
         // User is available during sign-in
@@ -85,6 +87,6 @@ export const authConfig = {
       return session;
     },
   },
-} satisfies NextAuthConfig;
+};
 
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);
+export const { handlers, signIn, signOut, auth } = NextAuth(config);
