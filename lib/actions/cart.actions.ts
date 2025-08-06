@@ -63,11 +63,24 @@ export async function addItemToCart(data: CartItem) {
 
       // Revalidate product page
       revalidatePath(`/product/${product.slug}`);
+
+      return {
+        success: true,
+        message: `${product.name} added to cart`,
+      };
     } else {
+      // Check if item is already in cart
+      const existItem = (cart.items as CartItem[]).find(
+        (x) => x.productId === item.productId
+      );
+
+      if (existItem) {
+        // Check stock
+        if (product.stock < existItem.qty + 1) {
+          throw new Error('Not enough stock');
+        }
+      }
     }
-    return {
-      success: true,
-    };
   } catch (error) {
     return {
       success: false,
