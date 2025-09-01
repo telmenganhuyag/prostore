@@ -56,7 +56,7 @@ export const config = {
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger }: any) {
       if (user) {
         // User is available during sign-in
         token.id = user.id;
@@ -71,6 +71,30 @@ export const config = {
             where: { id: user.id },
             data: { name: token.name },
           });
+        }
+
+        if (trigger === 'signIn' || trigger === 'signUp') {
+          const cookiesObject = await cookies();
+          const sessionCartId = cookiesObject.get('sessionCartId')?.value;
+
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId },
+            });
+
+            if (sessionCart) {
+              // Delete current user cart
+              await prisma.cart.deleteMany({
+                where: { userId: user.id },
+              });
+
+              // Assign new cart
+              await prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id },
+              });
+            }
+          }
         }
       }
       return token;
